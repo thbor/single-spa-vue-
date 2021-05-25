@@ -26,6 +26,10 @@ console.log('appOptions',appOptions)
 if (!window.singleSpaNavigate) {
   delete appOptions.el
   new Vue(appOptions).$mount('#app')
+}else{
+  console.log("webpack那裡")
+  __webpack_public_path__ = 'http://localhost:10000/'
+
 }
 // 如果是微前端模式下，single-spa会在window上挂在一个singleSpaNavigate的属性。
 // 这时候我们需要将public_path改成子项目中的地址。

@@ -17,7 +17,6 @@ async function loadScript(url){
 }
 registerApplication('childvue',
 async()=>{
-  console.log("加載模塊")
   await loadScript(`http://localhost:10000/js/chunk-vendors.js`);
   await loadScript(`http://localhost:10000/js/app.js`)
   return window.singleVue;

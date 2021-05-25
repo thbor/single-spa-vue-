@@ -1,0 +1,68 @@
+
+single-spa
+父vue，子vue
+1.父應用下載single-spa，子應用下載single-spa-vue
+
+2.父應用src/main.js
+import {registerApplication,start} from 'single-spa'
+async function loadScript(url){
+  return new Promise((resolve,reject)=>{
+    let script = document.createElement('script');
+    script.src = url;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  })
+}
+registerApplication('childvue',
+async()=>{
+  console.log("加載模塊")
+  await loadScript(`http://localhost:10000/js/chunk-vendors.js`);
+  await loadScript(`http://localhost:10000/js/app.js`)
+  return window.singleVue;                              //與子節點的library:"singleVue"一樣
+},location=>location.pathname.startsWith('/childvue'))  //以vue開始的頁面
+start()
+childvue為子應用的id和包名，需要掛載在父應用的App.vue裡面，id為childvue
+
+3.子應用src/main.js
+import singleSpaVue from "single-spa-vue" 
+const appOptions = {
+  el:'#childvue',     //掛載到父應用id為childvue的節點上
+  router,
+  store,
+  render: h => h(App)
+}
+const vueLifeCycle = singleSpaVue({
+  Vue,
+  appOptions
+})
+if (!window.singleSpaNavigate) {
+  delete appOptions.el
+  new Vue(appOptions).$mount('#app')
+}
+export const bootstrap = vueLifeCycle.bootstrap;
+export const mount = vueLifeCycle.mount;
+export const unmount = vueLifeCycle.unmount;
+4.子應用根目錄vue.config.js
+module.exports = {
+  configureWebpack:{
+    output:{
+      library:"singleVue",
+      libraryTarget:"umd"
+    },
+    devServer:{port:10000}  //父應用端口號
+  }
+}
+
+
+5.修改子應用裡面的路由：base: '/childvue',
+6.這時css樣式並沒有進行隔離，子應用影響到了父應用
+7.加載子應用的about也是相對於父應用的，所以about無法加載,需要在後面加上__webpack_public_path__，如果這裡有__webpack_public_path__沒有定義就
+就去掉eslintrc.js裡面的'eslint:recommended'這句話
+if (!window.singleSpaNavigate) {
+  delete appOptions.el
+  new Vue(appOptions).$mount('#app')
+}else{
+  console.log("webpack那裡")
+  __webpack_public_path__ = 'http://localhost:10000/'
+}
