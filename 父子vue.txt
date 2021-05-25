@@ -58,7 +58,7 @@ module.exports = {
 5.修改子應用裡面的路由：base: '/childvue',
 6.這時css樣式並沒有進行隔離，子應用影響到了父應用
 7.加載子應用的about也是相對於父應用的，所以about無法加載,需要在後面加上__webpack_public_path__，如果這裡有__webpack_public_path__沒有定義就
-就去掉eslintrc.js裡面的'eslint:recommended'這句話
+就去掉eslintrc.js裡面的'eslint:recommended'這句話，這樣就可以讓子應用可以使用子應用自己的路由
 if (!window.singleSpaNavigate) {
   delete appOptions.el
   new Vue(appOptions).$mount('#app')
